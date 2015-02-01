@@ -129,7 +129,7 @@ public class GameMaster {
 	*/
 	private static void showDescription() {
 		System.out.println("");
-		System.out.println("選択する列・行・アクション（o or x）を順に入力してください。");
+		System.out.println("選択する列・行・アクション（開く:o or 地雷チェック:x）を順に入力してください。");
 		System.out.println("例：a0o");
 	}
 
