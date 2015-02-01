@@ -10,7 +10,7 @@ import java.util.List;
 class MainView {
 	private int numOfLine;
 	private int numOfMine;
-	private Square[] squares;
+	private Square[][] squares;
 	private int[] mineNums;
 
 	/**
@@ -32,8 +32,21 @@ class MainView {
 	private void setupMines() {
 		Random rand = new Random();
         mineNums = new int[numOfMine];
+        int randNum;
+
         for (int i = 0; i < numOfMine; i++) {
-        	mineNums[i] = rand.nextInt(numOfLine * numOfLine);
+        	randNum = rand.nextInt(numOfLine * numOfLine);
+
+        	// 重複しないようにするための処理
+        	for (int j = 0; j < i; j++) {
+        		if (mineNums[j] == randNum) {
+        			randNum = rand.nextInt(numOfLine * numOfLine);
+        			j = -1; // 重複があったら最初から確認し直す
+        			continue;
+        		}
+        	}
+
+        	mineNums[i] = randNum;
         }
 	}
 
@@ -41,25 +54,29 @@ class MainView {
 	* それぞれのマスの内容を設定するメソッド
 	*/
 	private void setupSquares() {
-        squares = new Square[numOfLine * numOfLine];
-		for (int i = 0; i < numOfLine * numOfLine; i++) {
-			if (isContainsInMineNums(i)) {
-				squares[i] = new Square();
-				System.out.println(i);
-			} else {
-				squares[i] = new Square(countNeighboringMine(i));
+        squares = new Square[numOfLine][numOfLine];
+
+		for (int i = 0; i < numOfLine; i++) {
+			for (int j = 0; j < numOfLine; j++) {
+				int serialNum = i * numOfLine + j; // 通し番号
+
+				if (containsInMineNums(serialNum)) {
+					squares[i][j] = new Square();
+				} else {
+					squares[i][j] = new Square(countNeighboringMine(i, j));
+				}
 			}
 		}
 	}
 
 	/**
-	* 地雷の番号の配列に数字が含まれているかどうかを判定するメソッド
-	* @param num 対象となるマスの配列における番号
-	* @return true: 含まれている false: 含まれていない
+	* 地雷番号の配列に数字が含まれているかどうかを判定するメソッド
+	* @param serialNum 対象となるマスの通し番号
+	* @return true:含まれている false:含まれていない
 	*/
-	private boolean isContainsInMineNums(int num) {
+	private boolean containsInMineNums(int serialNum) {
 		for (int i : mineNums) {
-			if (i == num) {
+			if (i == serialNum) {
 				return true;
 			}
 		}
@@ -69,13 +86,15 @@ class MainView {
 
 	/**
 	* 隣接する地雷数を数えるメソッド
-	* @param squareNum 対象となるマスの配列における番号
+	* @param row 対象となるマスの行番号
+	* @param column 対象となるマスの列番号
 	* @return 隣接する地雷数
 	*/
-	private int countNeighboringMine(int squareNum) {
+	private int countNeighboringMine(int row, int column) {
 		int result = 0;
+
 		for (int num : mineNums) {
-			if (isNeighboring(squareNum, num)) {
+			if (isNeighboring(row, column, num)) {
 				result++;
 			}
 		}
@@ -85,44 +104,39 @@ class MainView {
 
 	/**
 	* マスと地雷が隣接しているかどうかを判定するメソッド
-	* @param squareNum 対象となるマスの配列における番号
+	* @param row 対象となるマスの行番号
+	* @param column 対象となるマスの列番号
 	* @param mineNum 対象となる地雷の配列における番号
-	* @return true: 隣接　false: 隣接していない
+	* @return true:隣接　false:隣接していない
 	*/
-	private boolean isNeighboring(int squareNum, int mineNum) {
-		switch (squareNum) {
-			// 角
-			case 0:
-				return mineNum == 1
-					|| mineNum == numOfLine
-					|| mineNum == numOfLine + 1;
-			case numOfLine - 1:
-				return mineNum == numOfLine - 2
-					|| mineNum == 2 * numOfLine - 2
-					|| mineNum == 2 * numOfLine - 1;
-			case numOfLine * (numOfLine - 1):
-				return mineNum == numOfLine * (numOfLine - 2)
-					|| mineNum == numOfLine * (numOfLine - 2) + 1
-					|| mineNum == numOfLine * (numOfLine - 1) + 1;
-			case numOfLine * numOfLine - 1:
-				return mineNum == numOfLine * (numOfLine - 1) - 2
-					|| mineNum == numOfLine * (numOfLine - 1) - 1
-					|| mineNum == numOfLine * numOfLine - 2;
-			// 端
-			case 
-		}
+	private boolean isNeighboring(int row, int column, int mineNum) {
+		// 通し番号から行と列に変換
+		int rowOfMine = mineNum / numOfLine; // 商が行番号になる
+		int columnOfMine = mineNum % numOfLine; // 余りが列番号になる
+		
+		return row - 1 == rowOfMine && column - 1 == columnOfMine
+			|| row - 1 == rowOfMine && column == columnOfMine
+			|| row - 1 == rowOfMine && column + 1 == columnOfMine
+			|| row == rowOfMine && column - 1 == columnOfMine
+			|| row == rowOfMine && column + 1 == columnOfMine
+			|| row + 1 == rowOfMine && column - 1 == columnOfMine
+			|| row + 1 == rowOfMine && column == columnOfMine
+			|| row + 1 == rowOfMine && column + 1 == columnOfMine;
 	}
 
 	/**
 	* ビューを表示するメソッド
 	*/
 	public void showView() {
+		System.out.println("");
 		System.out.println("  a b c d e");
+		
 		for (int i = 0; i < numOfLine; i++) {
 			System.out.print(i);
-			for (int j = i * numOfLine; j < i * numOfLine + numOfLine; j++) {
+
+			for (int j = 0; j < numOfLine; j++) {
 				System.out.print(" ");
-				squares[j].showState();
+				squares[i][j].showState();
 			}
 
 			System.out.println("");
@@ -131,18 +145,53 @@ class MainView {
 
 	/**
 	* マスを開くメソッド
-	* @param num 対象となるマスの配列における番号
+	* @param row 対象となるマスの行番号
+	* @param column 対象となるマスの列番号
 	*/
-	public void openSquare(int num) {
-		squares[num].hasOpened = true;
+	public void openSquare(int row, int column) {
+		squares[row][column].hasOpened = true;
 	}
 
 	/**
 	* マスに地雷チェックを入れるメソッド
-	* @param num 対象となるマスの配列における番号
+	* @param row 対象となるマスの行番号
+	* @param column 対象となるマスの列番号
 	*/
-	public void checkSquare(int num) {
-		squares[num].hasChecked = true;
+	public void checkSquare(int row, int column) {
+		squares[row][column].hasChecked = true;
+	}
+
+	/**
+	* マスが地雷かどうかを判定するメソッド
+	* @param row 対象となるマスの行番号
+	* @param column 対象となるマスの列番号
+	* @return true:地雷 false:地雷でない 
+	*/
+	public boolean isMine(int row, int column) {
+		if (squares[row][column].isMine) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	* 開いていないマス数を求めるメソッド
+	* @return 開いていないマス数
+	*/
+	public int getClosedSquares() {
+		int closedSquares = numOfLine * numOfLine;
+
+		// 開いているマス数を全マス数から引く
+		for (int i = 0; i < numOfLine; i++) {
+			for (int j = 0; j < numOfLine; j++) {
+				if (squares[i][j].hasOpened) {
+					closedSquares--;
+				}
+			}
+		}
+
+		return closedSquares;
 	}
 
 }

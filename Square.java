@@ -6,17 +6,15 @@
 class Square {
 	private static final char wrap = '?';
 	private static final char checker = 'x';
-	public boolean hasOpened;
-	public boolean hasChecked;
-	private boolean isMine;
+	public boolean hasOpened = false;
+	public boolean hasChecked = false;
+	public boolean isMine;
 	private int content;
 
 	/**
 	* マスが地雷のときに呼ばれるコンストラクタ 
 	*/
 	public Square() {
-		this.hasOpened = false;
-		this.hasChecked = false;
 		this.isMine = true;
 		this.content = -1;
 	} 
@@ -26,8 +24,6 @@ class Square {
 	* @param content 隣接する地雷数
 	*/
 	public Square(int content) {
-		this.hasOpened = false;
-		this.hasChecked = false;
 		this.isMine = false;
 		this.content = content;
 	}
