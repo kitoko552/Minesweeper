@@ -158,7 +158,11 @@ class MainView {
 	* @param column 対象となるマスの列番号
 	*/
 	public void checkSquare(int row, int column) {
-		squares[row][column].hasChecked = true;
+		if (squares[row][column].hasChecked) {
+			squares[row][column].hasChecked = false;
+		} else {
+			squares[row][column].hasChecked = true;
+		}
 	}
 
 	/**
@@ -169,6 +173,20 @@ class MainView {
 	*/
 	public boolean isMine(int row, int column) {
 		if (squares[row][column].isMine) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	* マスが地雷チェックされているかどうかを判定するメソッド
+	* @param row 対象となるマスの行番号
+	* @param column 対象となるマスの列番号
+	* @return true:地雷チェック済み false:地雷チェックされていない 
+	*/
+	public boolean hasChecked(int row, int column) {
+		if (squares[row][column].hasChecked) {
 			return true;
 		}
 

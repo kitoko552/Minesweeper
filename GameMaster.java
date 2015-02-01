@@ -159,6 +159,10 @@ public class GameMaster {
 	* @param column マスの列番号
 	*/
 	private static void handleOpenAction(int row, int column) {
+		if (view.hasChecked(row, column)) {
+			return;
+		}
+
 		if (view.isMine(row, column)) {
 			showGameOver();
 			System.exit(0);
