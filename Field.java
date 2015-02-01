@@ -5,7 +5,7 @@ import java.util.List;
 /**
 * マインスイーパーのフィールドクラス 
 * @author 木藤紘介
-* @version 3.0
+* @version 4.0
 */
 class Field {
 	private static final int CODE_OF_A = 97; // aの文字コード
@@ -95,7 +95,7 @@ class Field {
 		int result = 0;
 
 		for (int num : mineNums) {
-			if (isNeighboring(row, column, num)) {
+			if (neighborsMine(row, column, num)) {
 				result++;
 			}
 		}
@@ -110,7 +110,7 @@ class Field {
 	* @param mineNum 対象となる地雷の配列における番号
 	* @return true:隣接　false:隣接していない
 	*/
-	private boolean isNeighboring(int row, int column, int mineNum) {
+	private boolean neighborsMine(int row, int column, int mineNum) {
 		// 通し番号から行と列に変換
 		int rowOfMine = mineNum / numOfLines; // 商が行番号になる
 		int columnOfMine = mineNum % numOfLines; // 余りが列番号になる
@@ -126,9 +126,9 @@ class Field {
 	}
 
 	/**
-	* ビューを表示するメソッド
+	* フィールドを表示するメソッド
 	*/
-	public void show() {
+	public void showField() {
 		System.out.println("");
 		System.out.print(" ");
 
@@ -158,7 +158,50 @@ class Field {
 	* @param column 対象となるマスの列番号
 	*/
 	public void openSquare(int row, int column) {
+		// 再帰呼び出しの際に隣接する0のマスが互いに参照し続けないようにする
+		if (squares[row][column].hasOpened) {
+			return;
+		}
+
 		squares[row][column].hasOpened = true;
+
+		if (squares[row][column].getContent() == 0) {
+			openNeighboringSquare(row, column);
+		}
+	}
+
+	/**
+	* マスと隣接するマスを開けるメソッド
+	* @param row 対象となるマスの行番号
+	* @param column 対象となるマスの列番号
+	*/
+	private void openNeighboringSquare(int row, int column) {
+		for (int i = 0; i < numOfLines; i++) {
+			for (int j = 0; j < numOfLines; j++) {
+				if (isNeighboring(row, column, i, j)) {
+					openSquare(i, j);
+				}
+			}
+		}
+	}
+
+	/**
+	* マス同士が隣接しているかどうかを判定するメソッド
+	* @param originRow 比較元となるマスの行番号
+	* @param originColumn 比較元となるマスの列番号
+	* @param targetRow 比較対象となるマスの行番号
+	* @param targetColumn 比較対象となるマスの列番号
+	* @return true:隣接している false:隣接していない
+	*/
+	private boolean isNeighboring(int originRow, int originColumn, int targetRow, int targetColumn) {
+		return targetRow == originRow - 1 && targetColumn == originColumn - 1
+			|| targetRow == originRow - 1 && targetColumn == originColumn
+			|| targetRow == originRow - 1 && targetColumn == originColumn + 1
+			|| targetRow == originRow && targetColumn == originColumn - 1
+			|| targetRow == originRow && targetColumn == originColumn + 1
+			|| targetRow == originRow + 1 && targetColumn == originColumn - 1
+			|| targetRow == originRow + 1 && targetColumn == originColumn
+			|| targetRow == originRow + 1 && targetColumn == originColumn + 1;
 	}
 
 	/**
@@ -181,7 +224,7 @@ class Field {
 	* @return true:地雷 false:地雷でない 
 	*/
 	public boolean isMine(int row, int column) {
-		if (squares[row][column].isMine) {
+		if (squares[row][column].isMine()) {
 			return true;
 		}
 

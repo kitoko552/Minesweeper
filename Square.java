@@ -1,14 +1,14 @@
 /**
 * マインスイーパーのマスクラス 
 * @author 木藤紘介
-* @version 3.0
+* @version 4.0
 */
 class Square {
-	private static final char wrap = '?';
+	private static final char wrap = '@';
 	private static final char checker = 'x';
 	public boolean hasOpened = false;
 	public boolean hasChecked = false;
-	public boolean isMine;
+	private boolean isMine;
 	private int content;
 
 	/**
@@ -26,6 +26,18 @@ class Square {
 	public Square(int content) {
 		this.isMine = false;
 		this.content = content;
+	}
+
+	/**
+	* contentのゲッター
+	* @return content
+	*/
+	public int getContent() {
+		return this.content;
+	}
+
+	public boolean isMine() {
+		return this.isMine;
 	}
 
 	/**

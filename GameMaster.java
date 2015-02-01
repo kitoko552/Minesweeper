@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 /**
 * マインスイーパーのマスタークラス 
 * @author 木藤紘介
-* @version 3.0
+* @version 4.0
 */
 public class GameMaster {
 	private static final int CODE_OF_A = 97; // aの文字コード
@@ -109,7 +109,7 @@ public class GameMaster {
 
 		try {
 			while (!isClear()) {
-				field.show();
+				field.showField();
 				showDescription();
 
 				String input = reader.readLine();
@@ -145,7 +145,7 @@ public class GameMaster {
 				}
 			}
 
-			field.show();
+			field.showField();
 			showGameClear();
 
 		} catch (IOException e) {
