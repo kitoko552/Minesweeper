@@ -3,24 +3,25 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
-* マインスイーパーのビュークラス 
+* マインスイーパーのフィールドクラス 
 * @author 木藤紘介
-* @version 1.0
+* @version 3.0
 */
-class MainView {
-	private int numOfLine;
-	private int numOfMine;
+class Field {
+	private static final int CODE_OF_A = 97; // aの文字コード
+	private int numOfLines;
+	private int numOfMines;
 	private Square[][] squares;
 	private int[] mineNums;
 
 	/**
 	* コンストラクタ 
-	* @param numOfLine 行数
-	* @param numOfMine 地雷数
+	* @param numOfLines 行数
+	* @param numOfMines 地雷数
 	*/
-	public MainView(int numOfLine, int numOfMine) {
-		this.numOfLine = numOfLine;
-		this.numOfMine = numOfMine;
+	public Field(int numOfLines, int numOfMines) {
+		this.numOfLines = numOfLines;
+		this.numOfMines = numOfMines;
 
 		setupMines();
 		setupSquares();
@@ -31,16 +32,16 @@ class MainView {
 	*/
 	private void setupMines() {
 		Random rand = new Random();
-        mineNums = new int[numOfMine];
+        mineNums = new int[numOfMines];
         int randNum;
 
-        for (int i = 0; i < numOfMine; i++) {
-        	randNum = rand.nextInt(numOfLine * numOfLine);
+        for (int i = 0; i < numOfMines; i++) {
+        	randNum = rand.nextInt(numOfLines * numOfLines);
 
         	// 重複しないようにするための処理
         	for (int j = 0; j < i; j++) {
         		if (mineNums[j] == randNum) {
-        			randNum = rand.nextInt(numOfLine * numOfLine);
+        			randNum = rand.nextInt(numOfLines * numOfLines);
         			j = -1; // 重複があったら最初から確認し直す
         			continue;
         		}
@@ -54,11 +55,11 @@ class MainView {
 	* それぞれのマスの内容を設定するメソッド
 	*/
 	private void setupSquares() {
-        squares = new Square[numOfLine][numOfLine];
+        squares = new Square[numOfLines][numOfLines];
 
-		for (int i = 0; i < numOfLine; i++) {
-			for (int j = 0; j < numOfLine; j++) {
-				int serialNum = i * numOfLine + j; // 通し番号
+		for (int i = 0; i < numOfLines; i++) {
+			for (int j = 0; j < numOfLines; j++) {
+				int serialNum = i * numOfLines + j; // 通し番号
 
 				if (containsInMineNums(serialNum)) {
 					squares[i][j] = new Square();
@@ -111,8 +112,8 @@ class MainView {
 	*/
 	private boolean isNeighboring(int row, int column, int mineNum) {
 		// 通し番号から行と列に変換
-		int rowOfMine = mineNum / numOfLine; // 商が行番号になる
-		int columnOfMine = mineNum % numOfLine; // 余りが列番号になる
+		int rowOfMine = mineNum / numOfLines; // 商が行番号になる
+		int columnOfMine = mineNum % numOfLines; // 余りが列番号になる
 		
 		return row - 1 == rowOfMine && column - 1 == columnOfMine
 			|| row - 1 == rowOfMine && column == columnOfMine
@@ -127,15 +128,23 @@ class MainView {
 	/**
 	* ビューを表示するメソッド
 	*/
-	public void showView() {
+	public void show() {
 		System.out.println("");
-		System.out.println("  a b c d e");
+		System.out.print(" ");
+
+		// 数字からアルファベットに変換する処理
+		for (int i = 0; i < numOfLines; i++) {
+			char alpha = (char)(i + CODE_OF_A);
+			System.out.print("  " + alpha);
+		}
+
+		System.out.println("");
 		
-		for (int i = 0; i < numOfLine; i++) {
+		for (int i = 0; i < numOfLines; i++) {
 			System.out.print(i);
 
-			for (int j = 0; j < numOfLine; j++) {
-				System.out.print(" ");
+			for (int j = 0; j < numOfLines; j++) {
+				System.out.print("  ");
 				squares[i][j].showState();
 			}
 
@@ -198,11 +207,11 @@ class MainView {
 	* @return 開いていないマス数
 	*/
 	public int getClosedSquares() {
-		int closedSquares = numOfLine * numOfLine;
+		int closedSquares = numOfLines * numOfLines;
 
 		// 開いているマス数を全マス数から引く
-		for (int i = 0; i < numOfLine; i++) {
-			for (int j = 0; j < numOfLine; j++) {
+		for (int i = 0; i < numOfLines; i++) {
+			for (int j = 0; j < numOfLines; j++) {
 				if (squares[i][j].hasOpened) {
 					closedSquares--;
 				}

@@ -1,7 +1,7 @@
 /**
 * マインスイーパーのマスクラス 
 * @author 木藤紘介
-* @version 1.0
+* @version 3.0
 */
 class Square {
 	private static final char wrap = '?';
